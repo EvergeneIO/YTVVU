@@ -15,7 +15,7 @@ jobs:
         with:
           image: evergene/ytvvu
           tags: ${GITHUB_REF#refs/*/},latest
-          registry: hub.docker.com
+          registry: docker.io
           dockerfile: Dockerfile
           username: newtthewolf
           password: ${{ secrets.PASSWORD }}
