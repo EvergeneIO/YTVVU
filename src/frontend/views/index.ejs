@@ -1,0 +1,13 @@
+<% layout('layouts/layout.ejs') %>
+<h1>THIS IS ADMIN</h1>
+<button onclick="login()">TEST</button>
+
+<script>
+  function login() {
+    window.open(
+      "https://discord.com/oauth2/authorize?client_id=890007205200408607&redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Fcallback&response_type=code&scope=identify%20email%20guilds.join",
+      "Test",
+      "location=0,menubar=0,scrollbars=no,status=0,titlebar=0,toolbar=0,resizable=no,top=200,left=400,,width=450,height=800"
+    );
+  }
+</script>

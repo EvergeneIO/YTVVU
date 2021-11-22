@@ -1,0 +1,6 @@
+.github
+.vscode
+.prettierrc
+.env
+commands
+scripts.ts
