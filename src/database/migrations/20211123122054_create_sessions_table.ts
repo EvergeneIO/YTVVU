@@ -5,20 +5,19 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
   /** Runs on migrate */
   async up(): Promise<void> {
     await runQuery(`
-    create table settings
-    (
-        id     bigint not null,
-        notify boolean default true,
-        emailVerify boolean default false
-    );
-    
-    create unique index settings_id_uindex
-        on settings (id);
-          `);
+    create table sessions
+      (
+          "userId"    bigint not null,
+          "sessionId" text   not null,
+          exp         bigint not null,
+          constraint sessions_pkey
+              primary key ("userId", "sessionId")
+      );
+    `);
   }
 
   /** Runs on rollback */
   async down(): Promise<void> {
-    await runQuery(``);
+    await runQuery(`drop table sessions`);
   }
 }

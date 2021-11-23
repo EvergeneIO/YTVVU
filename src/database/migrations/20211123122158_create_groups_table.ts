@@ -4,16 +4,19 @@ import { runQuery } from "../database.ts";
 export default class extends AbstractMigration<ClientPostgreSQL> {
   /** Runs on migrate */
   async up(): Promise<void> {
-    await runQuery(`CREATE TABLE "sessions" (
-            "userId" BIGINT,
-            "sessionId" TEXT,
-            "exp" BIGINT not null,
-            PRIMARY KEY ("userId", "sessionId")
-        );`);
+    await runQuery(`
+    create table groups
+      (
+          name        text   not null
+              constraint table_name_pk
+                  primary key,
+          permissions bigint not null
+      );
+    `);
   }
 
   /** Runs on rollback */
   async down(): Promise<void> {
-    await runQuery(`DROP TABLE "sessions";`);
+    await runQuery(`drop table groups`);
   }
 }
