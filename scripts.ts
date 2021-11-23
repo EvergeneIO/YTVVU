@@ -8,17 +8,22 @@ export default {
       allow: ["net", "read", "env", "run"],
     },
     migrate: {
-      cmd: "https://deno.land/x/nessie@2.0.0/cli.ts migrate",
+      cmd: "https://deno.land/x/nessie@2.0.4/cli.ts migrate",
       unstable: true,
       allow: ["net", "read", "env"],
     },
+    migration: {
+      cmd: "https://deno.land/x/nessie@2.0.4/cli.ts make:migration",
+      unstable: true,
+      allow: ["net", "read", "write", "env"],
+    },
     seed: {
-      cmd: "https://deno.land/x/nessie@2.0.0/cli.ts seed",
+      cmd: "https://deno.land/x/nessie@2.0.4/cli.ts seed",
       unstable: true,
       allow: ["net", "read", "env"],
     },
     rollback: {
-      cmd: "https://deno.land/x/nessie@2.0.0/cli.ts rollback",
+      cmd: "https://deno.land/x/nessie@2.0.4/cli.ts rollback",
       unstable: true,
       allow: ["net", "read", "env"],
     },
