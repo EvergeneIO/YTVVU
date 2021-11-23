@@ -6,9 +6,12 @@ export const groups = mammoth.defineTable({
 });
 
 export const linkedAccounts = mammoth.defineTable({
-  userId: mammoth.bigint().primaryKey(),
-  provider: mammoth.text().primaryKey().unique(),
-  email: mammoth.text().unique().notNull(),
+  userId: mammoth.bigint().notNull(),
+  channelId: mammoth.text().primaryKey().notNull(),
+  name: mammoth.text().notNull(),
+  profilePicture: mammoth.text().notNull(),
+  banner: mammoth.text().default("https://cdn.statically.io/img/i.ibb.co/b5k58Rh/default-banner.png"),
+  uploads: mammoth.text().notNull(),
   accessToken: mammoth.text().notNull(),
   refreshToken: mammoth.text().notNull(),
 });
