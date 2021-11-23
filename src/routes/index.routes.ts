@@ -11,6 +11,8 @@ router.get("/", async (context: Context) => {
 });
 
 router.get("/register", async (context: Context) => {
+  //let username = context.state.user!.username;
+  // * ! sagt einfach, dass du weißst dass das defined is gtg ja
   await sendEta(context, "register", {
     page: { title: "Register" },
     captcha: { siteKey: configs.captcha.siteKey },

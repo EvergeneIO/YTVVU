@@ -100,4 +100,8 @@ console.log({ passes, errors });
 logger.info(token);
  */
 
-await sendMail("dspitzli9@gmail.com", "Test Mail", "SOME TEST", "<h1>Test</h1>");
+/* await sendMail("dspitzli9@gmail.com", "Test Mail", "SOME TEST", "<h1>Test</h1>"); */
+
+const [test] = await db.select(db.star()).from(db.users).where(db.users.id.eq(1n));
+
+console.log(test);

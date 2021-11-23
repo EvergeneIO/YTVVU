@@ -13,8 +13,6 @@ export const db = {
 
     const dbResult = await sql.unsafe(query, params);
 
-    await sql.end();
-
     logger.debug("[DATABASE] query result", query, params, dbResult);
 
     return {
