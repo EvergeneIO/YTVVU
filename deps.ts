@@ -10,9 +10,10 @@ export {
 } from "https://deno.land/x/oak@v9.0.0/mod.ts";
 export { config as dotEnvConfig } from "https://deno.land/x/dotenv@v3.0.0/mod.ts";
 export * from "https://deno.land/std@0.105.0/fmt/colors.ts";
-export { Pool } from "https://deno.land/x/postgres@v0.12.0/mod.ts";
-export { AbstractMigration, ClientPostgreSQL } from "https://deno.land/x/nessie@2.0.0/mod.ts";
-export type { NessieConfig, PostgreSQLClientOptions } from "https://deno.land/x/nessie@2.0.0/mod.ts";
+export { Pool } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
+export type { ConnectionOptions } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
+export { AbstractMigration, ClientPostgreSQL } from "https://deno.land/x/nessie@2.0.4/mod.ts";
+export type { NessieConfig, PostgreSQLClientOptions } from "https://deno.land/x/nessie@2.0.4/mod.ts";
 export { copy, copySync, walk, walkSync, existsSync } from "https://deno.land/std@0.105.0/fs/mod.ts";
 export { format } from "https://deno.land/std@0.105.0/datetime/mod.ts";
 export { prompt, Input, Checkbox } from "https://deno.land/x/cliffy@v0.19.2/prompt/mod.ts";

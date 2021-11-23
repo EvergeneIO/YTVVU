@@ -1,4 +1,4 @@
-import { PostgreSQLClientOptions, Pool, postgres } from "../../deps.ts";
+import { PostgreSQLClientOptions, Pool, postgres, ConnectionOptions } from "../../deps.ts";
 import configs from "../../configs.ts";
 
 export const sql = postgres({
@@ -25,7 +25,7 @@ export const pool = new Pool(
   true
 );
 
-export const connectionOptions: PostgreSQLClientOptions = {
+export const connectionOptions: ConnectionOptions = {
   database: configs.database.database,
   hostname: configs.database.host,
   port: configs.database.port,
