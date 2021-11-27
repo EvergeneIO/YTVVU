@@ -7,6 +7,7 @@ import * as middlewares from "./src/middlewares/middlewares.ts";
 import { router } from "./router.ts";
 import { StateContext } from "./src/types/mod.ts";
 import { redis } from "./src/database/cache/redis.ts";
+import { cacheGroups } from "./src/database/cache/groups.ts";
 
 const start = Date.now();
 
@@ -28,6 +29,8 @@ const migration = Deno.run({
 });
 
 await migration.status();
+
+await cacheGroups();
 
 if (!redis.isConnected) throw new Error("Could not Connect to Redis");
 
