@@ -191,15 +191,9 @@ router.post(
       .where(db.users.email.eq(body.email).or(db.users.username.eq(body.username)));
 
     if (checkUser) {
-      if (checkUser.email === body.email) {
-        throw new httpErrors.BadRequest("email already in use");
-      }
-
-      if (checkUser.username === body.username) {
-        throw new httpErrors.BadRequest("username already in use");
-      }
+      throw new httpErrors.BadRequest("username or email already in use");
     }
-    context.state.user;
+
     const avatarUrl = `https://cdn.statically.io/avatar/${body.username}`;
     const [user] = await db
       .insertInto(db.users)
@@ -297,16 +291,5 @@ router.post(
 
 
 }) */
-
-router.post("/checkUsername", async (context: Context) => {
-  const usernames = await db.select(db.users.username).from(db.users);
-  const body = await context.request.body({ type: "json" }).value.catch(() => ({}));
-
-  if (usernames.some((username) => username.username === body.username)) {
-    return (context.response.body = { message: true });
-  }
-
-  return (context.response.body = { message: false });
-});
 
 export default router;
