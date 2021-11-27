@@ -2,213 +2,67 @@
 <html lang="en" class="h-100">
   <head>
     <%~ includeFile("components/head.ejs", it) %>
-    <style>
-      .invalidButton {
-        cursor: not-allowed;
-      }
-    </style>
   </head>
 
-  <body class="vh-100">
-    <div class="authincation h-100">
-      <div class="container h-100">
-        <div class="row justify-content-center h-100 align-items-center">
-          <div class="col-md-6">
-            <div class="authincation-content">
-              <div class="row no-gutters">
-                <div class="col-xl-12">
-                  <div class="auth-form">
-                    <h4 class="text-center mb-4">Sign up your account</h4>
-                    <form id="reg" onsubmit="submit()">
-                      <div id="usernameDiv" class="mb-3">
-                        <label class="mb-1"><strong>Username</strong></label>
-                        <input
-                          onblur="validator('username')"
-                          id="username"
-                          type="text"
-                          class="form-control"
-                          placeholder="username"
-                          required
-                        />
-                      </div>
-                      <div id="emailDiv" class="mb-3">
-                        <label class="mb-1"><strong>Email</strong></label>
-                        <input
-                          onblur="validator('email')"
-                          id="email"
-                          type="email"
-                          class="form-control"
-                          placeholder="hello@example.com"
-                          required
-                        />
-                      </div>
-                      <div id="passwordDiv" class="mb-3">
-                        <label class="mb-1"><strong>Password</strong></label>
-                        <input
-                          onblur="validator('password')"
-                          id="password"
-                          type="password"
-                          class="form-control"
-                          placeholder="Password"
-                          required
-                        />
-                      </div>
-                      <div id="buttonDiv" class="text-center mt-4">
-                        <button
-                          id="submit"
-                          type="submit"
-                          class="h-captcha btn btn-primary btn-block"
-                          data-theme="dark"
-                          data-sitekey="<%~ it.captcha.siteKey %>"
-                          data-callback="onSubmit"
-                        >
-                          Sign me up
-                        </button>
-                      </div>
-                    </form>
-                    <div class="new-account mt-3">
-                      <p>Already have an account? <a class="text-primary" href="login">Sign in</a></p>
-                    </div>
-                    This site is protected by hCaptcha and its
-                    <a href="https://hcaptcha.com/privacy">Privacy Policy</a> and
-                    <a href="https://hcaptcha.com/terms">Terms of Service</a> apply.
-                  </div>
-                </div>
+  <body class="theme-dark border-top-wide border-primary d-flex flex-column">
+    <div class="page page-center">
+      <div class="container-tight py-4">
+        <div class="text-center mb-4">
+          <a href="."><img src="/images/logo.png" height="128" alt="" /></a>
+        </div>
+        <form class="card card-md" onsubmit="submit()">
+          <div class="card-body">
+            <h2 class="card-title text-center mb-4">Create new account</h2>
+            <div class="mb-3">
+              <label class="form-label required">Username</label>
+              <input
+                onblur="validateUsername()"
+                id="username"
+                type="text"
+                required
+                class="form-control"
+                placeholder="Enter username"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label required">Email address</label>
+              <input
+                onblur="validator('email')"
+                id="email"
+                type="email"
+                required
+                class="form-control"
+                placeholder="Enter email"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label required">Password</label>
+              <div class="input-group input-group-flat">
+                <input
+                  onblur="validator('password')"
+                  id="password"
+                  type="password"
+                  required
+                  class="form-control"
+                  placeholder="Password"
+                  autocomplete="off"
+                />
               </div>
             </div>
+            <div id="footer" class="form-footer">
+              <button id="button" type="submit" class="btn btn-primary w-100">Create new account</button>
+            </div>
           </div>
+        </form>
+        <div class="text-center text-muted mt-3">Already have account? <a href="/login" tabindex="-1">Sign in</a></div>
+        <div class="text-center text-muted mt-3">
+          This site is protected by hCaptcha and its
+          <a href="https://hcaptcha.com/privacy">Privacy Policy</a> and
+          <a href="https://hcaptcha.com/terms">Terms of Service</a> apply.
         </div>
       </div>
     </div>
-
-    <script>
-      const form = document.getElementById("reg");
-      /* form.addEventListener("submit", registerUser); */
-
-      function validator(type) {
-        toastr.options = {
-          closeButton: true,
-          debug: false,
-          newestOnTop: true,
-          progressBar: true,
-          positionClass: "toast-top-center",
-          preventDuplicates: false,
-          onclick: null,
-          showDuration: "300",
-          hideDuration: "1000",
-          timeOut: "5000",
-          extendedTimeOut: "1000",
-          showEasing: "swing",
-          hideEasing: "linear",
-          showMethod: "fadeIn",
-          hideMethod: "fadeOut",
-        };
-        if (type === "username") {
-          const username = document.getElementById("username").value;
-
-          if (!username) {
-            document.getElementById("usernameDiv").classList.add("input-danger");
-            toastr["error"]("username is required", "Error");
-          } else {
-            document.getElementById("usernameDiv").classList.remove("input-danger");
-          }
-
-          if (username.length < 3 || username.length > 32) {
-            document.getElementById("usernameDiv").classList.add("input-danger");
-            toastr["error"]("username characters length must be between 3-32", "Error");
-          } else {
-            document.getElementById("usernameDiv").classList.remove("input-danger");
-          }
-        }
-
-        if (type === "email") {
-          const email = document.getElementById("email").value;
-
-          if (!email) {
-            document.getElementById("emailDiv").classList.add("input-danger");
-            toastr["error"]("email is required", "Error");
-          } else {
-            document.getElementById("emailDiv").classList.remove("input-danger");
-          }
-
-          let reg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-          if (!reg.test(email)) {
-            document.getElementById("emailDiv").classList.add("input-danger");
-            toastr["error"]("email is not a valid email adress", "Error");
-          } else {
-            document.getElementById("emailDiv").classList.remove("input-danger");
-          }
-        }
-
-        if (type === "password") {
-          const password = document.getElementById("password").value;
-
-          if (!password) {
-            document.getElementById("passwordDiv").classList.add("input-danger");
-            toastr["error"]("password is required", "Error");
-          } else {
-            document.getElementById("passwordDiv").classList.remove("input-danger");
-          }
-
-          if (password.length < 8 || password.length > 63) {
-            document.getElementById("passwordDiv").classList.add("input-danger");
-            toastr["error"]("password characters length must be between 8-63", "Error");
-          } else {
-            document.getElementById("passwordDiv").classList.remove("input-danger");
-          }
-        }
-
-        if (
-          document.getElementById("usernameDiv").classList.contains("input-danger") ||
-          document.getElementById("emailDiv").classList.contains("input-danger") ||
-          document.getElementById("passwordDiv").classList.contains("input-danger") ||
-          document.getElementById("rpasswordDiv").classList.contains("input-danger")
-        ) {
-          toastr["error"]("some error in form, pls check all inputs", "Error");
-          document.getElementsByTagName("BUTTON")[0].setAttribute("disabled", "disabled");
-          document.getElementById("buttonDiv").classList.add("invalidButton");
-        } else {
-          document.getElementsByTagName("BUTTON")[0].removeAttribute("disabled", "disabled");
-          document.getElementById("buttonDiv").classList.remove("invalidButton");
-        }
-      }
-
-      async function onSubmit(captcha) {
-        const username = document.getElementById("username").value;
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-
-        const result = await fetch("/auth/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            email,
-            password,
-            captcha,
-          }),
-        }).then((res) => res.json());
-        console.log(result);
-
-        if (result.status === 200) {
-          // everythign went fine
-          alert("Success");
-        } else {
-          alert(result.message);
-        }
-      }
-    </script>
-
-    <!--**********************************
-	Scripts
-***********************************-->
-    <!-- Required vendors -->
-    <script src="/vendor/global/global.min.js"></script>
-    <script src="https://js.hcaptcha.com/1/api.js?hl=en" async defer></script>
+    <script src="/js/auth.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
-    <script src="/js/custom.min.js"></script>
-    <script src="/js/dlabnav-init.js"></script>
   </body>
 </html>

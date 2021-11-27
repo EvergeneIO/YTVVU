@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+  <head>
+    <%~ includeFile("components/head.ejs", it) %>
+  </head>
+
+  <body class="theme-dark border-top-wide border-primary d-flex flex-column">
+    <div class="page page-center">
+      <div class="container-tight py-4">
+        <div class="text-center mb-4">
+          <a href="."><img src="/images/logo.png" height="128" alt="" /></a>
+        </div>
+        <form class="card card-md" onsubmit="submit()">
+          <div class="card-body">
+            <h2 class="card-title text-center mb-4">Create new account</h2>
+            <div class="mb-3">
+              <label class="form-label required">Username</label>
+              <input
+                onblur="validator('username')"
+                id="username"
+                type="text"
+                required
+                class="form-control"
+                placeholder="Enter username"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label required">Email address</label>
+              <input
+                onblur="validator('email')"
+                id="email"
+                type="email"
+                required
+                class="form-control"
+                placeholder="Enter email"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label required">Password</label>
+              <div class="input-group input-group-flat">
+                <input
+                  onblur="validator('password')"
+                  id="password"
+                  type="password"
+                  required
+                  class="form-control"
+                  placeholder="Password"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+            <div id="footer" class="form-footer">
+              <button id="button" type="submit" class="btn btn-primary w-100">Create new account</button>
+            </div>
+          </div>
+        </form>
+        <div class="text-center text-muted mt-3">Already have account? <a href="/login" tabindex="-1">Sign in</a></div>
+      </div>
+    </div>
+    <script>
+      const form = document.getElementById("reg");
+      /* form.addEventListener("submit", registerUser); */
+
+      function validator(type) {
+        toastr.options = {
+          closeButton: true,
+          debug: false,
+          newestOnTop: true,
+          progressBar: true,
+          positionClass: "toast-top-center",
+          preventDuplicates: false,
+          onclick: null,
+          showDuration: "300",
+          hideDuration: "1000",
+          timeOut: "5000",
+          extendedTimeOut: "1000",
+          showEasing: "swing",
+          hideEasing: "linear",
+          showMethod: "fadeIn",
+          hideMethod: "fadeOut",
+        };
+        if (type === "username") {
+          const username = document.getElementById("username").value;
+
+          if (!username) {
+            document.getElementById("username").classList.add("is-invalid");
+            toastr["error"]("username is required", "Error");
+          } else {
+            document.getElementById("username").classList.remove("is-invalid");
+            document.getElementById("username").classList.add("is-valid");
+          }
+
+          if (username.length < 3 || username.length > 32) {
+            document.getElementById("username").classList.add("is-invalid");
+            toastr["error"]("username characters length must be between 3-32", "Error");
+          } else {
+            document.getElementById("username").classList.remove("is-invalid");
+            document.getElementById("username").classList.add("is-valid");
+          }
+        }
+
+        if (type === "email") {
+          const email = document.getElementById("email").value;
+
+          if (!email) {
+            document.getElementById("email").classList.add("is-invalid");
+            toastr["error"]("email is required", "Error");
+          } else {
+            document.getElementById("email").classList.remove("is-invalid");
+            document.getElementById("username").classList.add("is-valid");
+          }
+
+          let reg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+          if (!reg.test(email)) {
+            document.getElementById("email").classList.add("is-invalid");
+            toastr["error"]("email is not a valid email adress", "Error");
+          } else {
+            document.getElementById("email").classList.remove("is-invalid");
+            document.getElementById("username").classList.add("is-valid");
+          }
+        }
+
+        if (type === "password") {
+          const password = document.getElementById("password").value;
+
+          if (!password) {
+            document.getElementById("password").classList.add("is-invalid");
+            toastr["error"]("password is required", "Error");
+          } else {
+            document.getElementById("password").classList.remove("is-invalid");
+            document.getElementById("username").classList.add("is-valid");
+          }
+
+          if (password.length < 8 || password.length > 63) {
+            document.getElementById("password").classList.add("is-invalid");
+            toastr["error"]("password characters length must be between 8-63", "Error");
+          } else {
+            document.getElementById("password").classList.remove("is-invalid");
+            document.getElementById("username").classList.add("is-valid");
+          }
+        }
+
+        if (
+          document.getElementById("username").classList.contains("is-invalid") ||
+          document.getElementById("email").classList.contains("is-invalid") ||
+          document.getElementById("password").classList.contains("is-invalid")
+        ) {
+          toastr["error"]("some error in form, pls check all inputs", "Error");
+          document.getElementById("button").classList.add("disabled");
+          document.getElementById("footer").classList.add("cursor-not-allowed");
+        } else {
+          document.getElementById("button").classList.remove("disabled");
+          document.getElementById("footer").classList.remove("cursor-not-allowed");
+        }
+      }
+
+      async function onSubmit(captcha) {
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const result = await fetch("/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            captcha,
+          }),
+        }).then((res) => res.json());
+        console.log(result);
+
+        if (result.status === 200) {
+          // everythign went fine
+          alert("Success");
+        } else {
+          alert(result.message);
+        }
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
+  </body>
+</html>

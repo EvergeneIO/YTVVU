@@ -298,4 +298,15 @@ router.post(
 
 }) */
 
+router.post("/checkUsername", async (context: Context) => {
+  const usernames = await db.select(db.users.username).from(db.users);
+  const body = await context.request.body({ type: "json" }).value.catch(() => ({}));
+
+  if (usernames.some((username) => username.username === body.username)) {
+    return (context.response.body = { message: true });
+  }
+
+  return (context.response.body = { message: false });
+});
+
 export default router;
