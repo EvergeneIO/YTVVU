@@ -223,7 +223,7 @@ router.post(
       context
     );
     context.response.status = 200;
-    return (context.response.body = { status: "ok", message: "Success" });
+    return (context.response.body = { status: 200, message: "Success" });
   }
 );
 

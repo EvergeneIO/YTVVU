@@ -9,10 +9,7 @@
     "create": "deno run -A --unstable --no-check ./commands/mod.ts",
     "build-css": "tailwindcss build template/css/main.css -o src/frontend/public/css/main.css"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/EvergeneIO/template-api.git"
-  },
+  "repository": "git+https://github.com/EvergeneIO/template-api.git",
   "keywords": [],
   "author": "NewtTheWolf",
   "license": "Apache-2.0 License",
