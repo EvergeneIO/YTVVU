@@ -37,7 +37,7 @@ module.exports = {
         auth: './src/auth.ts',
         images: [
             './src/assets/logo.png',
-            './src/assets/favicon.png'
+            './src/assets/favicon.png',
         ]
     },
     module: {
