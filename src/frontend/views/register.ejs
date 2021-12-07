@@ -20,11 +20,18 @@
             <h2 class="card-title text-center mb-4">Create new account</h2>
             <div class="mb-3">
               <label class="form-label required">Username</label>
-              <input id="username" type="text" required class="form-control" placeholder="Enter username" />
+              <input
+                id="username"
+                type="text"
+                name="username"
+                required
+                class="form-control"
+                placeholder="Enter username"
+              />
             </div>
             <div class="mb-3">
               <label class="form-label required">Email address</label>
-              <input id="email" type="email" required class="form-control" placeholder="Enter email" />
+              <input id="email" type="email" name="email" required class="form-control" placeholder="Enter email" />
             </div>
             <div class="mb-3">
               <label class="form-label required">Password</label>
@@ -32,6 +39,7 @@
                 <input
                   id="password"
                   type="password"
+                  name="password"
                   required
                   class="form-control"
                   placeholder="Password"
@@ -94,6 +102,7 @@
                 <input
                   id="checkPassword"
                   type="password"
+                  name="check password"
                   required
                   class="form-control"
                   placeholder="Retype Password"
@@ -103,7 +112,7 @@
             </div>
             <div id="footer" class="form-footer">
               <button
-                id="button"
+                id="submit"
                 type="submit"
                 class="h-captcha btn btn-primary w-100"
                 data-sitekey="<%~ it.captcha.siteKey %>"
@@ -122,7 +131,6 @@
         </div>
       </div>
     </div>
-    <script src="/js/test.bundle.js"></script>
     <script src="/js/auth.bundle.js"></script>
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   </body>
