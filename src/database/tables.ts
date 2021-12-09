@@ -5,7 +5,7 @@ export const groups = mammoth.defineTable({
   permissions: mammoth.bigint().notNull(),
 });
 
-export const linkedAccounts = mammoth.defineTable({
+export const channels = mammoth.defineTable({
   userId: mammoth.bigint().notNull(),
   channelId: mammoth.text().primaryKey().notNull(),
   name: mammoth.text().notNull(),
