@@ -1,153 +1,131 @@
 // deno-lint-ignore-file camelcase
 import configs from "../../configs.ts";
 import { bcrypt, helpers, httpErrors, nanoid, Router, validator } from "../../deps.ts";
-import { Context } from "../types/mod.ts";
-import { sendEta, setTokens } from "../helpers/mod.ts";
-import { db } from "../database/database.ts";
-import { cachedSessions } from "../middlewares/fernet.middleware.ts";
-import { buildBody, generateMaylily, getErrorMessage, hashPassword, logger, quickId, sendMail } from "../utils/mod.ts";
-import { captcha, rateLimit, requestValidator, userGuard } from "../middlewares/middlewares.ts";
 import { DEFAULT_PERMISSIONS } from "../constants/permissions.ts";
 import { redis } from "../database/cache/redis.ts";
+import { db } from "../database/database.ts";
+import { setTokens } from "../helpers/mod.ts";
+import { cachedSessions } from "../middlewares/fernet.middleware.ts";
+import { rateLimit, requestValidator, userGuard } from "../middlewares/middlewares.ts";
+import { Channel, Context, Item } from "../types/mod.ts";
+import { buildBody, generateMaylily, hashPassword, logger, quickId, sendMail } from "../utils/mod.ts";
 
 export const router = new Router({ prefix: "/auth" });
 
 router.get("/google", userGuard(["Client"], "USER"), (context: Context) => {
-  context.response.body = { message: true };
+  context.response.redirect(
+    //"https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.force-ssl%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&response_type=code"
+    `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=${encodeURIComponent(
+      configs.oauth.google.scopes.join(" ")
+    )}&response_type=code&client_id=${configs.oauth.google.clientId}&redirect_uri=${encodeURIComponent(
+      configs.oauth.google.redirectUri
+    )}`
+  );
 });
 
-router.get("/callback/google", async (context: Context) => {
-  if (context.state.user) return context.response.redirect("/");
-  const accessCode = helpers.getQuery(context).code;
+router.get("/callback", userGuard(["Client"], "USER"), async (context: Context) => {
+  const redirect = await context.cookies.get("redirect");
+  context.cookies.delete("redirect");
 
-  if (!accessCode) {
-    const error = helpers.getQuery(context).error;
-    if (!error) throw new httpErrors.BadRequest(`no acces code from Discord`);
-    throw new httpErrors.BadRequest(error);
-  }
-
-  const data = new FormData();
-  data.append("client_id", configs.oauth.discord.clientId);
-  data.append("client_secret", configs.oauth.discord.clientSecret);
-  data.append("grant_type", "authorization_code");
-  data.append("redirect_uri", configs.oauth.discord.redirectUri);
-  data.append("scope", configs.oauth.discord.scopes.join(" "));
-  data.append("code", accessCode);
+  // ?error=access_denied
+  if (helpers.getQuery(context).error) return context.response.redirect("/?error=access_denied");
+  const code = helpers.getQuery(context).code;
+  const details = {
+    code,
+    client_id: configs.oauth.google.clientId,
+    client_secret: configs.oauth.google.clientSecret,
+    redirect_uri: configs.oauth.google.redirectUri,
+    grant_type: "authorization_code",
+  };
 
   interface Token {
     access_token: string;
-    token_type: string;
-    expires_in: number;
     refresh_token: string;
-    scope: string;
   }
 
-  const { token_type, access_token, refresh_token }: Token = await fetch("https://discord.com/api/oauth2/token", {
+  const { access_token, refresh_token }: Token = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
-    body: data,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    },
+    body: buildBody(details),
   }).then((res) => res.json());
 
-  const response = await fetch("https://discord.com/api/users/@me", {
-    method: "GET",
-    headers: {
-      authorization: `${token_type} ${access_token}`,
-    },
-  }).then((res) => res.json());
-
-  await fetch(`https://discord.com/api/guilds/${configs.discord.server}/members/${response.id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bot ${configs.discord.bot}`,
-    },
-    body: JSON.stringify({ access_token }),
-  });
-  response.avatarUrl = response.avatar
-    ? `https://cdn.discord.com/avatars/${response.id}/${response.avatar}.png?size=1024`
-    : `https://cdn.statically.io/avatar/${response.username}`;
-
-  const sessionId = quickId();
-
-  const [checkUser] = await db
-    .select(db.users.id, db.users.permissions, db.users.avatarUrl, db.users.groups)
-    .from(db.users)
-    .where(db.users.username.eq(response.username));
-
-  if (checkUser) {
-    await setTokens(
-      {
-        id: checkUser.id,
-        username: response.username,
-        email: response.email,
-        permissions: checkUser.permissions,
-        avatarUrl: checkUser.avatarUrl,
-        groups: checkUser.groups,
-        sessionId,
+  const resChannel: Channel = await fetch(
+    `https://youtube.googleapis.com/youtube/v3/channels?part=${encodeURIComponent(
+      configs.oauth.google.part.join(",")
+    )}&mine=true`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
       },
-      context
-    );
-    //return await sendEta(context, "callback");
-    return context.response.redirect("/");
+    }
+  ).then((res) => res.json());
+
+  const [channel]: Item[] = resChannel.items;
+
+  // const videos = new Map();
+  // const videosInfo = await fetch(
+  //   "https://youtube.googleapis.com/youtube/v3/activities?part=snippet%2CcontentDetails&maxResults=25&mine=true",
+  //   {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${res.access_token}`,
+  //     },
+  //   }
+  // ).then((res) => res.json());
+
+  const [checkChannel] = await db
+    .select(
+      db.channels.userId,
+      db.channels.channelId,
+      db.channels.name,
+      db.channels.profilePicture,
+      db.channels.banner,
+      db.channels.uploads,
+      db.channels.accessToken,
+      db.channels.refreshToken
+    )
+    .from(db.channels)
+    .where(db.channels.channelId.eq(channel.id));
+
+  logger.info(checkChannel);
+
+  if (checkChannel.userId)
+    return context.response.redirect(`/?error=${encodeURIComponent("channel already registered")}`);
+
+  if (!channel.brandingSettings.image) {
+    channel.brandingSettings.image = {
+      bannerExternalUrl: "https://cdn.statically.io/img/i.ibb.co/b5k58Rh/default-banner.png",
+    };
+    if (!channel.brandingSettings.image.bannerExternalUrl) {
+      channel.brandingSettings.image.bannerExternalUrl =
+        "https://cdn.statically.io/img/i.ibb.co/b5k58Rh/default-banner.png";
+    }
   }
-
-  const [user] = await db
-    .insertInto(db.users)
+  const [newChannel] = await db
+    .insertInto(db.channels)
     .values({
-      id: await generateMaylily(),
-      username: response.username,
-      email: response.email,
-      avatarUrl: response.avatarUrl,
-      permissions: DEFAULT_PERMISSIONS,
-    })
-    .returning("id");
-
-  if (!user.id) {
-    throw new httpErrors.InternalServerError("Something went wrong");
-  }
-
-  const [linked] = await db
-    .insertInto(db.linkedAccounts)
-    .values({
-      userId: user.id,
-      provider: "discord",
-      email: response.email,
+      userId: context.state.user!.id,
+      channelId: channel.id,
+      name: channel.snippet.title,
+      profilePicture: channel.snippet.thumbnails.medium.url,
+      banner: channel.brandingSettings.image.bannerExternalUrl,
+      uploads: channel.contentDetails.relatedPlaylists.uploads,
       accessToken: access_token,
       refreshToken: refresh_token,
     })
     .returning("userId");
+  if (!newChannel.userId) throw new httpErrors.InternalServerError("something went wrong when registering the channel");
 
-  if (!linked.userId) {
-    throw new httpErrors.InternalServerError("Something went wrong");
-  }
-
-  await db.insertInto(db.settings).values({ id: user.id });
-  await setTokens(
-    {
-      id: user.id,
-      username: response.username,
-      email: response.email,
-      permissions: DEFAULT_PERMISSIONS,
-      avatarUrl: response.avatarUrl,
-      groups: ["USER"],
-      sessionId: quickId(),
-    },
-    context
+  context.response.redirect(
+    redirect
+      ? `${redirect}?info=${encodeURIComponent("channel was added successfully")}`
+      : `/?info=${encodeURIComponent("channel was added successfully")}`
   );
-
-  const verifyToken = `${Date.now().toString(32)}.${nanoid(128)}`;
-
-  await redis.setex(verifyToken, 300, `${user.id}`);
-
-  sendMail(
-    response.email,
-    "Register Verify",
-    "Register Verify",
-    `<a href="${configs.general.hostname == "localhost" ? "http" : "https"}://${
-      configs.general.hostname
-    }/api/mail/verify?code=${verifyToken}">Verify your Mail adress</a>`
-  );
-
-  context.response.body = { msg: "ok" };
 });
 
 router.get("/logout", async (context: Context) => {
@@ -172,15 +150,14 @@ router.post(
     username: [validator.required, validator.lengthBetween(3, 32)],
     email: [validator.required, validator.isEmail],
     password: [validator.required, validator.lengthBetween(8, 63)],
-    captcha: validator.required,
+    //captcha: validator.required,
   }),
-  captcha(),
   async (context: Context) => {
     interface Body {
       username: string;
       email: string;
       password: string;
-      captcha: string;
+      captcha?: string;
     }
 
     const body: Body = await context.request.body({ type: "json" }).value.catch(() => ({}));
@@ -233,14 +210,13 @@ router.post(
   requestValidator({
     username: validator.required,
     password: validator.required,
-    captcha: validator.required,
+    //captcha: validator.required,
   }),
-  captcha(),
   async (context: Context) => {
     interface Body {
       username: string;
       password: string;
-      captcha: string;
+      captcha?: string;
     }
     const body: Body = await context.request.body({ type: "json" }).value.catch(() => ({}));
 
