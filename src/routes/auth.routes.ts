@@ -7,7 +7,7 @@ import { db } from "../database/database.ts";
 import { setTokens } from "../helpers/mod.ts";
 import { cachedSessions } from "../middlewares/fernet.middleware.ts";
 import { rateLimit, requestValidator, userGuard } from "../middlewares/middlewares.ts";
-import { Channel, Context, Item } from "../types/mod.ts";
+import { Channel, Context, ChannelItem } from "../types/mod.ts";
 import { buildBody, generateMaylily, hashPassword, logger, quickId, sendMail } from "../utils/mod.ts";
 
 export const router = new Router({ prefix: "/auth" });
@@ -53,7 +53,7 @@ router.get("/callback", userGuard(["Client"], "USER"), async (context: Context) 
 
   const resChannel: Channel = await fetch(
     `https://youtube.googleapis.com/youtube/v3/channels?part=${encodeURIComponent(
-      configs.oauth.google.part.join(",")
+      configs.oauth.google.parts.channel.join(",")
     )}&mine=true`,
     {
       method: "GET",
@@ -64,7 +64,7 @@ router.get("/callback", userGuard(["Client"], "USER"), async (context: Context) 
     }
   ).then((res) => res.json());
 
-  const [channel]: Item[] = resChannel.items;
+  const [channel]: ChannelItem[] = resChannel.items;
 
   // const videos = new Map();
   // const videosInfo = await fetch(

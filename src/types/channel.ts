@@ -1,38 +1,38 @@
-export interface PageInfo {
+interface PageInfo {
   totalResults: number;
   resultsPerPage: number;
 }
 
-export interface Default {
+interface Default {
   url: string;
   width: number;
   height: number;
 }
 
-export interface Medium {
+interface Medium {
   url: string;
   width: number;
   height: number;
 }
 
-export interface High {
+interface High {
   url: string;
   width: number;
   height: number;
 }
 
-export interface Thumbnails {
+interface Thumbnails {
   default: Default;
   medium: Medium;
   high: High;
 }
 
-export interface Localized {
+interface Localized {
   title: string;
   description: string;
 }
 
-export interface Snippet {
+interface Snippet {
   title: string;
   description: string;
   publishedAt: Date;
@@ -41,23 +41,23 @@ export interface Snippet {
   country: string;
 }
 
-export interface RelatedPlaylists {
+interface RelatedPlaylists {
   likes: string;
   uploads: string;
 }
 
-export interface ContentDetails {
+interface ContentDetails {
   relatedPlaylists: RelatedPlaylists;
 }
 
-export interface Statistics {
+interface Statistics {
   viewCount: string;
   subscriberCount: string;
   hiddenSubscriberCount: boolean;
   videoCount: string;
 }
 
-export interface Item {
+export interface ChannelItem {
   kind: string;
   etag: string;
   id: string;
@@ -71,20 +71,20 @@ export interface Channel {
   kind: string;
   etag: string;
   pageInfo: PageInfo;
-  items: Item[];
+  items: ChannelItem[];
 }
 
-export interface ChannelBranding {
+interface ChannelBranding {
   title: string;
   keywords?: string;
   country?: string;
 }
 
-export interface Image {
+interface Image {
   bannerExternalUrl?: string;
 }
 
-export interface BrandingSettings {
+interface BrandingSettings {
   channel: ChannelBranding;
   image?: Image;
 }

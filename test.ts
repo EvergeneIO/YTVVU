@@ -11,6 +11,7 @@ if (perms & Permissions.ADMIN) {
 } */
 
 import { createSecret } from "https://deno.land/x/fernet@0.2.0/mod.ts";
+import configs from "./configs.ts";
 import { Groups } from "./src/database/cache/groups.ts";
 import db from "./src/database/database.ts";
 import { formatTime, logger, sendMail } from "./src/utils/mod.ts";
@@ -102,6 +103,12 @@ logger.info(token);
 
 /* await sendMail("dspitzli9@gmail.com", "Test Mail", "SOME TEST", "<h1>Test</h1>"); */
 
-const [test] = await db.select(db.star()).from(db.users).where(db.users.id.eq(1n));
+/* const [test] = await db.select(db.star()).from(db.users).where(db.users.id.eq(1n));
 
-console.log(test);
+console.log(test); */
+
+const req = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${encodeURIComponent(
+  configs.oauth.google.parts.playlist.join(",")
+)}&playlistId=${""}&maxResults=50`;
+
+/* https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails%2Cid%2Csnippet%2Cstatus&playlistId=UU6TP7VIEnev5Zl4cqVTB84A */

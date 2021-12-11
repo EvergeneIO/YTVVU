@@ -1,10 +1,10 @@
-export default function showPassword(this: JQuery<HTMLElement>) {
+export default function showPassword(this: JQuery<Document>) {
   if ($(this).attr("id") === "on") {
-    $(this).hide();
+    $("svg#on").hide();
     $("svg#off").show();
   } else {
-    $(this).hide();
+    $("svg#off").hide();
     $("svg#on").show();
   }
-  $("input#password").attr("type", $("input#password").attr("type") === "password" ? "text" : "password");
+  $("input.password").attr("type", $("input#password").attr("type") === "password" ? "text" : "password");
 }

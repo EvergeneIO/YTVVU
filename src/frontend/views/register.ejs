@@ -2,6 +2,7 @@
 <html lang="en" class="h-100">
   <head>
     <%~ includeFile("components/head.ejs", it) %>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-hcaptcha"></script>
     <style>
       .hidden {
         display: none;
@@ -10,6 +11,27 @@
   </head>
 
   <body class="theme-dark border-top-wide border-primary d-flex flex-column">
+    <svg
+      version="1.1"
+      id="preloader"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      x="0px"
+      y="0px"
+      viewBox="0 0 100 100"
+      enable-background="new 0 0 0 0"
+      xml:space="preserve"
+    >
+      <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
+        <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
+      </circle>
+      <circle fill="#fff" stroke="none" cx="26" cy="50" r="6">
+        <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
+      </circle>
+      <circle fill="#fff" stroke="none" cx="46" cy="50" r="6">
+        <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
+      </circle>
+    </svg>
     <div class="page page-center">
       <div class="container-tight py-4">
         <div class="text-center mb-4">
@@ -41,13 +63,13 @@
                   type="password"
                   name="password"
                   required
-                  class="form-control"
+                  class="form-control password"
                   placeholder="Password"
                   autocomplete="off"
                 />
                 <span class="input-group-text">
                   <a
-                    id="showPassword on"
+                    id="showPassword"
                     href="#"
                     class="link-secondary ms-2"
                     title="Show Password"
@@ -106,35 +128,85 @@
                   type="password"
                   name="check password"
                   required
-                  class="form-control"
+                  class="form-control password"
                   placeholder="Retype Password"
                   autocomplete="off"
                 />
+                <span class="input-group-text">
+                  <a
+                    id="showPassword"
+                    href="#"
+                    class="link-secondary ms-2"
+                    title="Show Password"
+                    data-bs-toggle="tooltip"
+                  >
+                    <svg
+                      id="on"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon icon-tabler icon-tabler-eye"
+                      width="44"
+                      height="44"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="#2c3e50"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <circle cx="12" cy="12" r="2" />
+                      <path
+                        d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7"
+                      />
+                    </svg>
+
+                    <svg
+                      id="off"
+                      display="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon icon-tabler icon-tabler-eye-off"
+                      width="44"
+                      height="44"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="#2c3e50"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <line x1="3" y1="3" x2="21" y2="21" />
+                      <path d="M10.584 10.587a2 2 0 0 0 2.828 2.83" />
+                      <path
+                        d="M9.363 5.365a9.466 9.466 0 0 1 2.637 -.365c4 0 7.333 2.333 10 7c-.778 1.361 -1.612 2.524 -2.503 3.488m-2.14 1.861c-1.631 1.1 -3.415 1.651 -5.357 1.651c-4 0 -7.333 -2.333 -10 -7c1.369 -2.395 2.913 -4.175 4.632 -5.341"
+                      />
+                    </svg>
+                  </a>
+                </span>
               </div>
             </div>
+            <div class="input-group input-group-flat">
+              <h-captcha
+                id="signupCaptcha"
+                site-key="<%~ it.captcha.siteKey %>"
+                size="invisible"
+                tabindex="0"
+                theme="dark"
+              ></h-captcha>
+            </div>
             <div id="footer" class="form-footer">
-              <button
-                id="submit"
-                type="submit"
-                class="h-captcha btn btn-primary w-100"
-                data-theme="dark"
-                data-sitekey="<%~ it.captcha.siteKey %>"
-                data-callback="onSubmit"
-              >
-                Create new account
-              </button>
+              <button id="submit" type="submit" class="btn btn-primary w-100">Create new account</button>
             </div>
           </div>
         </form>
         <div class="text-center text-muted mt-3">Already have account? <a href="/login" tabindex="-1">Sign in</a></div>
-        <div class="text-center text-muted mt-3">
-          This site is protected by hCaptcha and its
-          <a href="https://hcaptcha.com/privacy">Privacy Policy</a> and
-          <a href="https://hcaptcha.com/terms">Terms of Service</a> apply.
-        </div>
       </div>
     </div>
     <script src="/js/auth.bundle.js"></script>
-    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    <script>
+      /*       $("button#submit").on("click", () => {
+        hcaptcha.execute()
+      }) */
+    </script>
   </body>
 </html>
