@@ -11,27 +11,6 @@
   </head>
 
   <body class="theme-dark border-top-wide border-primary d-flex flex-column">
-    <svg
-      version="1.1"
-      id="preloader"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      x="0px"
-      y="0px"
-      viewBox="0 0 100 100"
-      enable-background="new 0 0 0 0"
-      xml:space="preserve"
-    >
-      <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
-        <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.1" />
-      </circle>
-      <circle fill="#fff" stroke="none" cx="26" cy="50" r="6">
-        <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.2" />
-      </circle>
-      <circle fill="#fff" stroke="none" cx="46" cy="50" r="6">
-        <animate attributeName="opacity" dur="1s" values="0;1;0" repeatCount="indefinite" begin="0.3" />
-      </circle>
-    </svg>
     <div class="page page-center">
       <div class="container-tight py-4">
         <div class="text-center mb-4">
@@ -49,11 +28,20 @@
                 required
                 class="form-control"
                 placeholder="Enter username"
+                value="Newt"
               />
             </div>
             <div class="mb-3">
               <label class="form-label required">Email address</label>
-              <input id="email" type="email" name="email" required class="form-control" placeholder="Enter email" />
+              <input
+                id="email"
+                type="email"
+                name="email"
+                required
+                class="form-control"
+                placeholder="Enter email"
+                value="dominik@spitzli.dev"
+              />
             </div>
             <div class="mb-3">
               <label class="form-label required">Password</label>
@@ -66,6 +54,7 @@
                   class="form-control password"
                   placeholder="Password"
                   autocomplete="off"
+                  value="DanaAkira2"
                 />
                 <span class="input-group-text">
                   <a
@@ -131,6 +120,7 @@
                   class="form-control password"
                   placeholder="Retype Password"
                   autocomplete="off"
+                  value="DanaAkira2"
                 />
                 <span class="input-group-text">
                   <a
