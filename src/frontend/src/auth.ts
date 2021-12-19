@@ -19,18 +19,28 @@ toastr.options.hideMethod = "fadeOut";
 //console.log(hcaptcha);
 
 $(window).on("load", function () {
-  console.log("AAAAAAA", this.hcaptcha);
-  const signupCaptcha = document.getElementById("signupCaptcha");
-
-  console.log(signupCaptcha);
-
   console.log("Document Content Loaded");
-  $("#signupCaptcha").on("opened", (e) => {
-    console.log("HCAPTCHA", e);
-  });
+  $("#signupCaptcha").on("verified", async (e) => {
+    const result = await fetch("/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: $("input#username").val(),
+        email: $("input#email").val(),
+        password: $("input#password").val(),
+        captcha: e.key,
+      }),
+    }).then((res) => res.json());
 
-  $("#signupCaptcha").on("executed", (e) => {
-    console.log("HCAPTCHA", e);
+    console.log(result.message);
+
+    if (result.status === 200) {
+      return window.location.replace("/");
+    } else {
+      return toastr["error"](result.message, "Error");
+    }
   });
 
   $("input#username,input#email,input#password,input#checkPassword").on("blur", validator);
@@ -51,29 +61,8 @@ $(window).on("load", function () {
   $("svg#on,svg#off").on("click", showPassword);
   $("form#form").submit(async (event) => {
     event.preventDefault();
-    //so hier überlasse ich dir
-    // willst du beim grossen test dabei sein?ig
 
-    return;
-    /*     const result = await fetch("/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: $("input#username").val(),
-          email: $("input#email").val(),
-          password: $("input#password").val(),
-        }),
-      }).then((res) => res.json());
-  
-      console.log(result.message);
-  
-      if (result.status === 200) {
-        return window.location.replace("/");
-      } else {
-        return toastr["error"](result.message, "Error");
-      } */
+    hcaptcha.execute();
   });
 });
 
