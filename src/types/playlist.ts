@@ -32,8 +32,8 @@ interface Thumbnails {
   default: Default;
   medium: Medium;
   high: High;
-  standard: Standard;
-  maxres: Maxres;
+  standard?: Standard;
+  maxres?: Maxres;
 }
 
 interface ResourceId {
@@ -42,7 +42,7 @@ interface ResourceId {
 }
 
 interface Snippet {
-  publishedAt: Date;
+  publishedAt: string;
   channelId: string;
   title: string;
   description: string;
@@ -57,7 +57,7 @@ interface Snippet {
 
 interface ContentDetails {
   videoId: string;
-  videoPublishedAt: Date;
+  videoPublishedAt: string;
 }
 
 interface Status {

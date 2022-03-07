@@ -9,3 +9,4 @@ export * from "./error.middleware.ts";
 export * from "./fernet.middleware.ts";
 export * from "./user_guard.middleware.ts";
 export * from "./file.middleware.ts";
+export { RateLimiter } from "https://deno.land/x/oak_rate_limit@0.1.0-rc2/mod.ts";

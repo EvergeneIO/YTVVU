@@ -6,7 +6,7 @@ import { redis } from "../database/cache/redis.ts";
 import { db } from "../database/database.ts";
 import { setTokens } from "../helpers/mod.ts";
 import { cachedSessions } from "../middlewares/fernet.middleware.ts";
-import { rateLimit, requestValidator, userGuard } from "../middlewares/middlewares.ts";
+import { ratelimit, requestValidator, userGuard } from "../middlewares/middlewares.ts";
 import { Channel, Context, ChannelItem } from "../types/mod.ts";
 import { buildBody, generateMaylily, hashPassword, logger, quickId, sendMail } from "../utils/mod.ts";
 
@@ -92,10 +92,7 @@ router.get("/callback", userGuard(["Client"], "USER"), async (context: Context) 
     .from(db.channels)
     .where(db.channels.channelId.eq(channel.id));
 
-  logger.info(checkChannel);
-
-  if (checkChannel.userId)
-    return context.response.redirect(`/?error=${encodeURIComponent("channel already registered")}`);
+  if (checkChannel) return context.response.redirect(`/?error=${encodeURIComponent("channel already registered")}`);
 
   if (!channel.brandingSettings.image) {
     channel.brandingSettings.image = {
@@ -145,7 +142,7 @@ router.get("/logout", async (context: Context) => {
 
 router.post(
   "/register",
-  rateLimit(600, 10),
+  ratelimit(600, 10),
   requestValidator({
     username: [validator.required, validator.lengthBetween(3, 32)],
     email: [validator.required, validator.isEmail],
@@ -206,7 +203,7 @@ router.post(
 
 router.post(
   "/login",
-  rateLimit(600, 10),
+  ratelimit(600, 10),
   requestValidator({
     username: validator.required,
     password: validator.required,
@@ -218,7 +215,7 @@ router.post(
       password: string;
       captcha?: string;
     }
-    const body: Body = await context.request.body({ type: "json" }).value.catch(() => ({}));
+    const body = await context.request.body({ type: "json" }).value.catch(() => ({}));
 
     const [user] = await db
       .select(

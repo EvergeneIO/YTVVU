@@ -14,7 +14,7 @@ const rateLimits = new Map<string, { requests: number; startedAt: number }>();
  *
  * Note: The rate limits are per IP
  */
-export function rateLimit(timeout: number, maxRequests: number, options?: { bucket?: string }) {
+export function ratelimit(timeout: number, maxRequests: number, options?: { bucket?: string }) {
   return async function (context: Context, next: () => Promise<unknown>) {
     const id = `${context.request.ip}-${options?.bucket ?? context.request.url.pathname}`;
     const rateLimit = rateLimits.get(id);

@@ -11,6 +11,7 @@ export default {
       cmd: "https://deno.land/x/nessie@2.0.4/cli.ts migrate",
       unstable: true,
       allow: ["net", "read", "env"],
+      noCheck: true,
     },
     migration: {
       cmd: "https://deno.land/x/nessie@2.0.4/cli.ts make:migration",

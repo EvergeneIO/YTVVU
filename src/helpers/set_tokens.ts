@@ -3,6 +3,7 @@ import configs from "../../configs.ts";
 import db from "../database/database.ts";
 import { createFernetToken } from "../utils/mod.ts";
 import { Client } from "../constants/token.ts";
+import { cachedSessions } from "../middlewares/middlewares.ts";
 
 export async function setTokens(user: Omit<User, "expires"> & { expires?: number }, context: Context) {
   const token = createFernetToken(

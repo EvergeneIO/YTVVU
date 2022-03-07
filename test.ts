@@ -14,6 +14,7 @@ import { createSecret } from "https://deno.land/x/fernet@0.2.0/mod.ts";
 import configs from "./configs.ts";
 import { Groups } from "./src/database/cache/groups.ts";
 import db from "./src/database/database.ts";
+//import { RateLimiter } from "./src/middlewares/middlewares.ts";
 import { formatTime, logger, sendMail } from "./src/utils/mod.ts";
 
 /* const perms = 7n;
@@ -107,8 +108,59 @@ logger.info(token);
 
 console.log(test); */
 
-const req = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${encodeURIComponent(
+/* const req = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=${encodeURIComponent(
   configs.oauth.google.parts.playlist.join(",")
-)}&playlistId=${""}&maxResults=50`;
+)}&playlistId=${""}&maxResults=50`; */
 
 /* https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails%2Cid%2Csnippet%2Cstatus&playlistId=UU6TP7VIEnev5Zl4cqVTB84A */
+
+/* let i = 0;
+let username = [];
+function makeid(length: number) {
+  var result = "";
+  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+let start = Date.now();
+
+while ((i = 10000)) {
+  username.push(makeid(8));
+  logger.info(makeid(8));
+  logger.info(username.length);
+  logger.info(formatTime(Date.now() - start));
+} */
+
+const [user] = await db.select(db.users.email).from(db.users);
+
+logger.info(user);
+
+const ratelimitWithPool = RateLimiter({
+  max: 1000,
+  pool: [
+    {
+      time: 1000, //one seccond
+      max: 10,
+    },
+    {
+      time: 1000 * 60, //one minute
+      max: 100,
+    },
+  ],
+});
+
+const WOLF = {
+  skin: "./assets/skin.png",
+  movement: 21,
+  jump: false,
+};
+
+const client = client.connect(hostname: "something")
+
+client.query("INSER INTO users....")
+
+const [user] = await db.select(db.users.email).from(db.users);

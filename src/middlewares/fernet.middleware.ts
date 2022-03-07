@@ -46,8 +46,10 @@ export async function fernetMiddleware(context: Context, next: () => Promise<unk
     if (!payload) throw new httpErrors.Unauthorized("invalid access token provided");
 
     if (isUserPayload(type, payload)) {
-      if (!payload?.sessionId || !(await validSession(payload.sessionId, BigInt(payload.id))))
+      if (!payload?.sessionId || !(await validSession(payload.sessionId, BigInt(payload.id)))) {
+        context.cookies.delete("token");
         throw new httpErrors.Unauthorized("invalid access token provided");
+      }
 
       if (payload.expires <= Date.now()) {
         await db.deleteFrom(db.sessions).where(db.sessions.sessionId.eq(payload.sessionId));
