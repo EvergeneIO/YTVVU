@@ -12,7 +12,7 @@ export type Context = OakContext<StateContext>;
 export interface User {
   id: bigint;
   username: string;
-  email: string;
+  //email: string;
   permissions: bigint;
   groups: string[];
   avatarUrl: string;

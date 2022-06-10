@@ -24,9 +24,9 @@ export async function errorMiddleware(context: Context, next: () => Promise<unkn
       logger.error(err);
     }
 
-    if (status === 401 && context.request.url.pathname.split("/")[1] !== "api") {
+    /* if (status === 401 && context.request.url.pathname.split("/")[1] !== "api") {
       return context.response.redirect("/login");
-    }
+    } */
 
     context.response.status = status;
     context.response.body = { status, message };

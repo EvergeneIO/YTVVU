@@ -7,18 +7,18 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
     await runQuery(`
     create table users
       (
-          id          bigint,
-          username    text                                not null,
-          email       text                                not null,
-          password    text,
-          "avatarUrl" text                                not null,
-          permissions bigint                              not null,
-          groups      text[] default ARRAY ['USER'::text] not null
+          id              bigint,
+          username        text                                not null,
+          email           text                                not null,
+          "accessToken"   text,
+          "refreshToken"  text,
+          "avatarUrl"     text                                not null,
+          permissions     bigint                              not null,
+          groups          text[] default ARRAY ['USER'::text] not null
       );
 
-      create unique index users_email_uindex
-      
-      on users (email);
+      create unique index users_email_uindex 
+          on users (email);
 
       create unique index users_username_uindex
           on users (username);

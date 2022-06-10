@@ -64,7 +64,7 @@ export interface ChannelItem {
   snippet: Snippet;
   contentDetails: ContentDetails;
   statistics: Statistics;
-  brandingSettings: BrandingSettings;
+  brandingSettings?: BrandingSettings;
 }
 
 export interface Channel {

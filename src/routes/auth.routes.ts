@@ -12,118 +12,152 @@ import { buildBody, generateMaylily, hashPassword, logger, quickId, sendMail } f
 
 export const router = new Router({ prefix: "/auth" });
 
-router.get("/google", userGuard(["Client"], "USER"), (context: Context) => {
-  context.response.redirect(
-    //"https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.force-ssl%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&response_type=code"
-    `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=${encodeURIComponent(
-      configs.oauth.google.scopes.join(" ")
-    )}&response_type=code&client_id=${configs.oauth.google.clientId}&redirect_uri=${encodeURIComponent(
-      configs.oauth.google.redirectUri
-    )}`
-  );
-});
-
-router.get("/callback", userGuard(["Client"], "USER"), async (context: Context) => {
-  const redirect = await context.cookies.get("redirect");
-  context.cookies.delete("redirect");
-
-  // ?error=access_denied
-  if (helpers.getQuery(context).error) return context.response.redirect("/?error=access_denied");
-  const code = helpers.getQuery(context).code;
-  const details = {
-    code,
-    client_id: configs.oauth.google.clientId,
-    client_secret: configs.oauth.google.clientSecret,
-    redirect_uri: configs.oauth.google.redirectUri,
-    grant_type: "authorization_code",
-  };
-
-  interface Token {
-    access_token: string;
-    refresh_token: string;
+router.get(
+  "/google",
+  /* userGuard(["Client"], "USER"), */ (context: Context) => {
+    context.response.redirect(
+      //"https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.force-ssl%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&response_type=code"
+      `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=${encodeURIComponent(
+        configs.oauth.google.scopes.join(" ")
+      )}&response_type=code&client_id=${configs.oauth.google.clientId}&redirect_uri=${encodeURIComponent(
+        configs.oauth.google.redirectUri
+      )}`
+    );
   }
+);
 
-  const { access_token, refresh_token }: Token = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-    },
-    body: buildBody(details),
-  }).then((res) => res.json());
+router.get(
+  "/callback",
+  /* userGuard(["Client"], "USER"), */ async (context: Context) => {
+    const redirect = await context.cookies.get("redirect");
+    context.cookies.delete("redirect");
 
-  const resChannel: Channel = await fetch(
-    `https://youtube.googleapis.com/youtube/v3/channels?part=${encodeURIComponent(
-      configs.oauth.google.parts.channel.join(",")
-    )}&mine=true`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-    }
-  ).then((res) => res.json());
-
-  const [channel]: ChannelItem[] = resChannel.items;
-
-  // const videos = new Map();
-  // const videosInfo = await fetch(
-  //   "https://youtube.googleapis.com/youtube/v3/activities?part=snippet%2CcontentDetails&maxResults=25&mine=true",
-  //   {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${res.access_token}`,
-  //     },
-  //   }
-  // ).then((res) => res.json());
-
-  const [checkChannel] = await db
-    .select(
-      db.channels.userId,
-      db.channels.channelId,
-      db.channels.name,
-      db.channels.profilePicture,
-      db.channels.banner,
-      db.channels.uploads,
-      db.channels.accessToken,
-      db.channels.refreshToken
-    )
-    .from(db.channels)
-    .where(db.channels.channelId.eq(channel.id));
-
-  if (checkChannel) return context.response.redirect(`/?error=${encodeURIComponent("channel already registered")}`);
-
-  if (!channel.brandingSettings.image) {
-    channel.brandingSettings.image = {
-      bannerExternalUrl: "https://cdn.statically.io/img/i.ibb.co/b5k58Rh/default-banner.png",
+    // ?error=access_denied
+    if (helpers.getQuery(context).error) return context.response.redirect("/?error=access_denied");
+    const code = helpers.getQuery(context).code;
+    const details = {
+      code,
+      client_id: configs.oauth.google.clientId,
+      client_secret: configs.oauth.google.clientSecret,
+      redirect_uri: configs.oauth.google.redirectUri,
+      grant_type: "authorization_code",
     };
-    if (!channel.brandingSettings.image.bannerExternalUrl) {
-      channel.brandingSettings.image.bannerExternalUrl =
-        "https://cdn.statically.io/img/i.ibb.co/b5k58Rh/default-banner.png";
-    }
-  }
-  const [newChannel] = await db
-    .insertInto(db.channels)
-    .values({
-      userId: context.state.user!.id,
-      channelId: channel.id,
-      name: channel.snippet.title,
-      profilePicture: channel.snippet.thumbnails.medium.url,
-      banner: channel.brandingSettings.image.bannerExternalUrl,
-      uploads: channel.contentDetails.relatedPlaylists.uploads,
-      accessToken: access_token,
-      refreshToken: refresh_token,
-    })
-    .returning("userId");
-  if (!newChannel.userId) throw new httpErrors.InternalServerError("something went wrong when registering the channel");
 
-  context.response.redirect(
-    redirect
-      ? `${redirect}?info=${encodeURIComponent("channel was added successfully")}`
-      : `/?info=${encodeURIComponent("channel was added successfully")}`
-  );
-});
+    interface Token {
+      access_token: string;
+      refresh_token: string;
+    }
+
+    const { access_token, refresh_token }: Token = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      },
+      body: buildBody(details),
+    }).then((res) => res.json());
+
+    const resChannel: Channel = await fetch(
+      `https://youtube.googleapis.com/youtube/v3/channels?part=${encodeURIComponent(
+        configs.oauth.google.parts.channel.join(",")
+      )}&mine=true`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    ).then((res) => res.json());
+
+    const [channel]: ChannelItem[] = resChannel.items;
+
+    // const videos = new Map();
+    // const videosInfo = await fetch(
+    //   "https://youtube.googleapis.com/youtube/v3/activities?part=snippet%2CcontentDetails&maxResults=25&mine=true",
+    //   {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${res.access_token}`,
+    //     },
+    //   }
+    // ).then((res) => res.json());
+
+    const [checkUser] = await db
+      .select(
+        db.users.id,
+        db.users.username,
+        db.users.accessToken,
+        db.users.refreshToken,
+        db.users.avatarUrl,
+        db.users.permissions,
+        db.users.groups,
+        db.channels.userId,
+        db.channels.channelId,
+        db.channels.name,
+        db.channels.profilePicture,
+        db.channels.banner,
+        db.channels.uploads
+      )
+      .from(db.users)
+      .leftJoin(db.channels)
+      .on(db.users.id.eq(db.channels.userId))
+      .where(db.channels.channelId.eq(channel.id));
+
+    if (checkUser) return context.response.redirect(`/?error=${encodeURIComponent("channel already registered")}`);
+
+    const id = await generateMaylily();
+
+    const [newChannel] = await db
+      .insertInto(db.channels)
+      .values({
+        userId: id,
+        channelId: channel.id,
+        name: channel.snippet.title,
+        profilePicture: channel.snippet.thumbnails.medium.url,
+        banner:
+          "https://cdn.statically.io/img/i.ibb.co/b5k58Rh/default-banner.png" /* channel.brandingSettings?.image?.bannerExternalUrl */,
+        uploads: channel.contentDetails.relatedPlaylists.uploads,
+      })
+      .returning("userId");
+    if (!newChannel.userId)
+      throw new httpErrors.InternalServerError("something went wrong when registering the channel");
+
+    const [newUser] = await db
+      .insertInto(db.users)
+      .values({
+        id,
+        username: channel.snippet.title,
+        //email: channel.snippet,
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        avatarUrl: channel.snippet.thumbnails.medium.url,
+        permissions: 1n,
+      })
+      .returning("id");
+    if (!newUser.id) throw new httpErrors.InternalServerError("something went wrong when registering the channel");
+
+    await db.insertInto(db.settings).values({ id });
+    await setTokens(
+      {
+        id,
+        username: channel.snippet.title,
+        //email: body.email,
+        permissions: DEFAULT_PERMISSIONS,
+        avatarUrl: channel.snippet.thumbnails.medium.url,
+        groups: ["USER"],
+        sessionId: quickId(),
+      },
+      context
+    );
+
+    context.response.redirect(
+      redirect
+        ? `${redirect}?info=${encodeURIComponent("channel was added successfully")}`
+        : `/?info=${encodeURIComponent("channel was added successfully")}`
+    );
+  }
+);
 
 router.get("/logout", async (context: Context) => {
   context.cookies.delete("token");

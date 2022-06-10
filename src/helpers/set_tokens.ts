@@ -10,7 +10,7 @@ export async function setTokens(user: Omit<User, "expires"> & { expires?: number
     {
       id: user.id.toString(),
       username: user.username,
-      email: user.email,
+      //email: user.email,
       permissions: user.permissions.toString(),
       avatarUrl: user.avatarUrl,
       groups: user.groups,

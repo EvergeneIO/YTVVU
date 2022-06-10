@@ -134,7 +134,7 @@ while ((i = 10000)) {
   logger.info(username.length);
   logger.info(formatTime(Date.now() - start));
 } */
-
+/* 
 const [user] = await db.select(db.users.email).from(db.users);
 
 logger.info(user);
@@ -163,4 +163,6 @@ const client = client.connect(hostname: "something")
 
 client.query("INSER INTO users....")
 
-const [user] = await db.select(db.users.email).from(db.users);
+const [user] = await db.select(db.users.email).from(db.users); */
+
+console.log(createSecret(32));

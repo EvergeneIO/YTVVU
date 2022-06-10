@@ -14,9 +14,7 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
           name             text   not null,
           "profilePicture" text   not null,
           banner           text   not null,
-          uploads          text   not null,
-          "accessToken"    text   not null,
-          "refreshToken"   text   not null
+          uploads          text   not null
       );
     `);
   }

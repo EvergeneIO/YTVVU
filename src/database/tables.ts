@@ -12,8 +12,6 @@ export const channels = mammoth.defineTable({
   profilePicture: mammoth.text().notNull(),
   banner: mammoth.text().default("https://cdn.statically.io/img/i.ibb.co/b5k58Rh/default-banner.png"),
   uploads: mammoth.text().notNull(),
-  accessToken: mammoth.text().notNull(),
-  refreshToken: mammoth.text().notNull(),
 });
 
 export const sessions = mammoth.defineTable({
@@ -31,8 +29,9 @@ export const settings = mammoth.defineTable({
 export const users = mammoth.defineTable({
   id: mammoth.bigint().unique().notNull(),
   username: mammoth.text().unique().notNull(),
-  email: mammoth.text().unique().notNull(),
-  password: mammoth.text(),
+  //email: mammoth.text().unique().notNull(),
+  accessToken: mammoth.text().notNull(),
+  refreshToken: mammoth.text().notNull(),
   avatarUrl: mammoth.text().notNull(),
   permissions: mammoth.bigint().notNull().default("1"),
   groups: mammoth.array(mammoth.text()).notNull().default("ARRAY['USER']::TEXT[]"),
